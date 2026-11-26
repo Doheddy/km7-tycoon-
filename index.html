@@ -269,12 +269,66 @@
         </button>
       </div>
     </div>
-    <script>
+    <script>var SUPABASE_URL = "https://qksvjlpknpehppgjdojt.supabase.co";
+var SUPABASE_KEY = "sb_publishable_aLYjZz0cQuc2b2pQgmzK0Q_lisjzfoQ"; // Collez votre Publishable / anon key
+var sb = (window.supabase && window.supabase.createClient)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
+var PLAYER_ID = localStorage.getItem("km7_player_id") || null;
+
       var P=[{n:1,price:4000,d:1000,tot:60000},{n:2,price:7000,d:1750,tot:105000}];
       var M=[{lv:1,need:3,r:1000},{lv:2,need:10,r:3000},{lv:3,need:30,r:8000}];
       var S={bal:4580,ben:0,day:1,own:[0,0],last:[[],[]],friends:3,rw:0,mdone:[],lastPt:0,code:0,hist:[]};
-      function load(){try{var t=localStorage.getItem('km7tycoon');if(t)S=Object.assign(S,JSON.parse(t))}catch(e){}}
-      function save(){try{localStorage.setItem('km7tycoon',JSON.stringify(S))}catch(e){}}
+     function save(){
+  try{ localStorage.setItem('km7_tycoon_save', JSON.stringify(S)); }catch(e){}
+  if(!sb) return;
+
+  var payload = {
+    pseudo: S.pseudo || "Joueur",
+    bal: Number(S.bal) || 0,
+    ben: Number(S.ben) || 0,
+    day: Number(S.day) || 1,
+    own: S.own || [],
+    hist: S.hist || [],
+    updated_at: new Date().toISOString()
+  };
+
+  if(PLAYER_ID){
+    sb.from("players").update(payload).eq("id", PLAYER_ID).then(function(res){
+      if(res.error) console.error("Erreur update Supabase:", res.error);
+    });
+  } else {
+    sb.from("players").insert(payload).select("id").single().then(function(res){
+      if(!res.error && res.data && res.data.id){
+        PLAYER_ID = res.data.id;
+        try{ localStorage.setItem("km7_player_id", PLAYER_ID); }catch(e){}
+      } else if(res.error){
+        console.error("Erreur insert Supabase:", res.error);
+      }
+    });
+  }
+}
+
+function load(){
+  try{
+    var t = localStorage.getItem('km7_tycoon_save');
+    if(t){ var d = JSON.parse(t); Object.assign(S, d); }
+  }catch(e){}
+
+  if(!sb || !PLAYER_ID) return;
+
+  sb.from("players").select("*").eq("id", PLAYER_ID).maybeSingle().then(function(res){
+    if(!res.error && res.data){
+      if(typeof res.data.bal !== "undefined") S.bal = Number(res.data.bal);
+      if(typeof res.data.ben !== "undefined") S.ben = Number(res.data.ben);
+      if(typeof res.data.day !== "undefined") S.day = Number(res.data.day);
+      if(res.data.own) S.own = res.data.own;
+      if(res.data.hist) S.hist = res.data.hist;
+      if(typeof render === "function") render();
+    }
+  });
+}
+
       function $(i){return document.getElementById(i)}
       function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
       function log(t){S.hist.unshift('Jour '+S.day+' · '+t);S.hist=S.hist.slice(0,40)}
