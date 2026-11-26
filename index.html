@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>KM7 TYCOON</title>
+    <style>
+      :root{--red:#d6213f;--pink:#ff6f9c;--ink:#2b1320;--mut:#7a5566;--card:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+      *{box-sizing:border-box}
+      html,body{margin:0}
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,var(--red),var(--pink));background-attachment:fixed;color:var(--ink);min-height:100vh;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+      .wrap{max-width:480px;margin:0 auto;padding:10px}
+      .banner{background:#fff3b0;color:#6b1020;font-weight:700;font-size:12px;text-align:center;padding:8px;border-radius:10px;margin-bottom:10px}
+      .card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(80,0,30,.2)}
+      h1{color:#fff;text-align:center;margin:4px 0 10px;font-size:24px;letter-spacing:1px}
+      h2{margin:0 0 10px;font-size:17px;color:var(--red)}
+      .bal{display:flex;gap:8px}.bal div{flex:1;background:#fff0f4;border-radius:12px;padding:10px;text-align:center;font-size:12px;color:var(--mut)}
+      .bal b{display:block;font-size:20px;color:var(--red)}
+      .btns{display:flex;gap:8px;margin-top:10px}
+      button{font:inherit;border:0;cursor:pointer}
+      .b{flex:1;background:linear-gradient(90deg,var(--red),var(--pink));color:#fff;font-weight:700;padding:11px 8px;border-radius:12px;font-size:14px}
+      .b:disabled{opacity:.45}
+      .b.alt{background:#fff;color:var(--red);border:2px solid var(--red)}
+      .notif{background:#fff;border-radius:12px;padding:8px 12px;font-size:12px;margin-bottom:12px;border-left:5px solid var(--red);min-height:34px}
+      .menu{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px}
+      .menu button{flex:0 0 auto;background:#fff;color:var(--red);font-weight:700;padding:9px 13px;border-radius:20px;font-size:13px}
+      .prod img,.prod svg{width:100%;height:auto;border-radius:12px;background:#ffe3ea;display:block}
+      .row{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+      .cnt{background:#ffe3ea;color:var(--red);font-weight:700;border-radius:10px;padding:2px 10px}
+      .nav{position:fixed;left:0;right:0;bottom:0;background:#fff;display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -3px 12px rgba(0,0,0,.18);z-index:5}
+      .nav button{flex:1;background:none;color:var(--mut);font-size:12px;padding:6px 0}
+      .nav button span{display:block;font-size:20px}
+      .nav button.on{color:var(--red);font-weight:700}
+      .mis{border:1px solid #f3c2cf;border-radius:12px;padding:10px;margin-top:8px;font-size:13px}
+      .mis .b{margin-top:8px;width:100%}
+      .bar{height:8px;background:#ffe3ea;border-radius:6px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--red)}
+      .ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:9;padding:16px}
+      .ov.on{display:flex}
+      .box{background:#fff;border-radius:18px;padding:18px;width:100%;max-width:380px}
+      .box input,.box select{width:100%;padding:11px;border:2px solid #f3c2cf;border-radius:10px;font:inherit;margin:6px 0 10px}
+      .box label{font-size:13px;color:var(--mut)}
+      .hist{font-size:13px;border-bottom:1px solid #f6dce4;padding:6px 0;display:flex;justify-content:space-between;gap:8px}
+      .pg{display:none}.pg.on{display:block}
+      .small{font-size:12px;color:var(--mut)}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="banner">
+        JEU FICTIF - DÉMO - Pièces Virtuelles Uniquement, Aucun argent réel
+      </div>
+      <h1>
+        KM7 TYCOON
+      </h1>
+      <div class="pg on" id="p-home">
+        <div class="card">
+          <div class="bal">
+            <div>
+              Dépôt Solde Virtuel
+              <b id="bal">0</b>
+              Pièces
+            </div>
+            <div>
+              Bénéfice Solde Virtuel
+              <b id="ben">0</b>
+              Pièces
+            </div>
+          </div>
+          <div class="btns">
+            <button class="b" onclick="openM('m-dep')">
+              Dépôt Virtuel
+            </button>
+            <button class="b alt" onclick="openM('m-ret')">
+              Retrait Virtuel
+            </button>
+          </div>
+          <div class="small" style="margin-top:8px;text-align:center">
+            Jour en jeu :
+            <b id="day">1</b>
+            ·
+            <a href="#" onclick="nextDay();return false" style="color:var(--red);font-weight:700">Jour suivant ▶</a>
+          </div>
+        </div>
+        <div class="notif" id="notif"></div>
+        <div class="menu">
+          <button onclick="openM('m-dep')">
+            Dépôt Virtuel
+          </button>
+          <button onclick="pointage()">
+            Pointage
+          </button>
+          <button onclick="openM('m-code')">
+            Code Cadeau
+          </button>
+          <button onclick="openM('m-ret')">
+            Retrait Virtuel
+          </button>
+          <button onclick="document.getElementById('missions').scrollIntoView({behavior:'smooth'})">
+            Missions
+          </button>
+        </div>
+        <div class="card">
+          <h2>
+            Produits Virtuels
+          </h2>
+          <div id="prods"></div>
+        </div>
+        <div class="card" id="missions">
+          <h2>
+            Missions
+          </h2>
+          <div style="background:#fff0f4;border-radius:12px;padding:10px;font-size:14px">
+            <b>Ma progression</b>
+            <br />
+            <span id="fr">3</span>
+            Amis invités dans le jeu
+            <br />
+            <span id="rw">0</span>
+            Pièces de Récompenses
+          </div>
+          <div id="mlist"></div>
+        </div>
+      </div>
+      <div class="pg" id="p-ord">
+        <div class="card">
+          <h2>
+            Mes Commandes
+          </h2>
+          <div id="orders"></div>
+        </div>
+      </div>
+      <div class="pg" id="p-inv">
+        <div class="card">
+          <h2>
+            Inviter
+          </h2>
+          <p style="font-size:14px">
+            Amis invités dans le jeu :
+            <b id="fr2">3</b>
+          </p>
+          <button class="b" style="width:100%" onclick="invite()">
+            Inviter un ami (démo)
+          </button>
+        </div>
+      </div>
+      <div class="pg" id="p-team">
+        <div class="card">
+          <h2>
+            Équipe
+          </h2>
+          <p style="font-size:14px">
+            Membres de l’équipe virtuelle :
+            <b id="fr3">3</b>
+          </p>
+        </div>
+      </div>
+      <div class="pg" id="p-me">
+        <div class="card">
+          <h2>
+            Me
+          </h2>
+          <div class="row">
+            <span>Solde</span>
+            <b id="bal2"></b>
+          </div>
+          <div class="row">
+            <span>Bénéfice</span>
+            <b id="ben2"></b>
+          </div>
+          <h2 style="margin-top:14px">
+            Historique
+          </h2>
+          <div id="hist"></div>
+        </div>
+      </div>
+    </div>
+    <div class="nav" id="nav">
+      <button class="on" data-p="home">
+        <span>🏠</span>
+        Accueil
+      </button>
+      <button data-p="ord">
+        <span>🧾</span>
+        Commandes
+      </button>
+      <button data-p="inv">
+        <span>🤝</span>
+        Inviter
+      </button>
+      <button data-p="team">
+        <span>👥</span>
+        Équipe
+      </button>
+      <button data-p="me">
+        <span>👤</span>
+        Me
+      </button>
+    </div>
+    <div class="ov" id="m-dep">
+      <div class="box">
+        <h2>
+          Dépôt Virtuel
+        </h2>
+        <label>
+          Montant (Pièces Virtuelles)
+        </label>
+        <select id="depAmt">
+          <option>1000</option>
+          <option>5000</option>
+          <option>10000</option>
+        </select>
+        <button class="b" style="width:100%" onclick="deposit()">
+          Déposer
+        </button>
+        <button class="b alt" style="width:100%;margin-top:8px" onclick="closeM()">
+          Fermer
+        </button>
+      </div>
+    </div>
+    <div class="ov" id="m-code">
+      <div class="box">
+        <h2>
+          Code Cadeau
+        </h2>
+        <label>
+          Entrez un code (essayez KM7GIFT)
+        </label>
+        <input id="codeIn" placeholder="CODE" />
+        <button class="b" style="width:100%" onclick="useCode()">
+          Valider
+        </button>
+        <button class="b alt" style="width:100%;margin-top:8px" onclick="closeM()">
+          Fermer
+        </button>
+      </div>
+    </div>
+    <div class="ov" id="m-ret">
+      <div class="box">
+        <h2>
+          Portefeuille Virtuel
+        </h2>
+        <label>
+          Montant du retrait (Pièces)
+        </label>
+        <select id="retAmt">
+          <option>1000</option>
+          <option>2000</option>
+          <option>5000</option>
+          <option>10000</option>
+        </select>
+        <label>
+          Numéro DEMO
+        </label>
+        <input id="retNum" value="07 00 00 00 00" readonly />
+        <button class="b" style="width:100%" onclick="withdraw()">
+          Retrait Virtuel
+        </button>
+        <button class="b alt" style="width:100%;margin-top:8px" onclick="closeM()">
+          Fermer
+        </button>
+      </div>
+    </div>
+    <div class="ov" id="m-msg">
+      <div class="box" style="text-align:center">
+        <h2 id="msgT"></h2>
+        <p id="msgB" style="font-size:14px"></p>
+        <button class="b" style="width:100%" onclick="closeM()">
+          OK
+        </button>
+      </div>
+    </div>
+    <script>
+      var P=[{n:1,price:4000,d:1000,tot:60000},{n:2,price:7000,d:1750,tot:105000}];
+      var M=[{lv:1,need:3,r:1000},{lv:2,need:10,r:3000},{lv:3,need:30,r:8000}];
+      var S={bal:4580,ben:0,day:1,own:[0,0],last:[[],[]],friends:3,rw:0,mdone:[],lastPt:0,code:0,hist:[]};
+      function load(){try{var t=localStorage.getItem('km7tycoon');if(t)S=Object.assign(S,JSON.parse(t))}catch(e){}}
+      function save(){try{localStorage.setItem('km7tycoon',JSON.stringify(S))}catch(e){}}
+      function $(i){return document.getElementById(i)}
+      function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
+      function log(t){S.hist.unshift('Jour '+S.day+' · '+t);S.hist=S.hist.slice(0,40)}
+      function car(){return '<svg viewBox="0 0 320 140"><rect width="320" height="140" fill="#ffe3ea"/><path d="M40 95l24-34c4-6 10-9 17-9h110c8 0 15 3 20 9l30 34c10 2 18 8 18 18v6H22v-6c0-9 8-16 18-18z" fill="#d6213f"/><path d="M82 60h54v32H66zM146 60h42l26 32h-68z" fill="#bfe7ff"/><circle cx="90" cy="118" r="20" fill="#222"/><circle cx="90" cy="118" r="9" fill="#ccc"/><circle cx="230" cy="118" r="20" fill="#222"/><circle cx="230" cy="118" r="9" fill="#ccc"/></svg>'}
+      function render(){
+        $('bal').textContent=fmt(S.bal);$('ben').textContent=fmt(S.ben);$('bal2').textContent=fmt(S.bal)+' Pièces';$('ben2').textContent=fmt(S.ben)+' Pièces';
+        $('day').textContent=S.day;$('rw').textContent=fmt(S.rw);
+        ['fr','fr2','fr3'].forEach(function(i){$(i).textContent=S.friends});
+        $('prods').innerHTML=P.map(function(p,i){return '<div class="card prod" style="box-shadow:none;border:1px solid #f3c2cf"><b>Produit VIRTUEL #'+p.n+'</b>'+(i==0?car():'')+'<div class="row"><span>Prix</span><b>'+fmt(p.price)+' Pièces Virtuelles</b></div><div class="row"><span>Récompense quotidienne</span><b>'+fmt(p.d)+' Pièces Virtuelles'+(i==0?' pendant 60 jours en jeu':'')+'</b></div><div class="row"><span>Total</span><b>'+fmt(p.tot)+' Pièces Virtuelles</b></div><div class="row"><span>Possédé</span><span class="cnt">'+S.own[i]+'/4</span></div><button class="b" style="width:100%" onclick="buy('+i+')"'+(S.own[i]>=4?' disabled':'')+'>ACHETER avec Pièces Virtuelles</button></div>'}).join('');
+        var h='';
+        P.forEach(function(p,i){for(var k=0;k<S.own[i];k++){var o=S.last[i][k]||{left:60,c:0};var ok=o.c!==S.day&&o.left>0;h+='<div class="mis"><b>Produit VIRTUEL #'+p.n+'</b> (n°'+(k+1)+')<br>Reste : '+o.left+' jours en jeu · +'+fmt(p.d)+'/jour<button class="b" onclick="collect('+i+','+k+')"'+(ok?'':' disabled')+'>'+(o.left<=0?'Terminé':ok?'Collecter':'Déjà collecté aujourd’hui')+'</button></div>'}});
+        $('orders').innerHTML=h||'<p class="small">Aucune commande pour le moment.</p>';
+        $('mlist').innerHTML=M.map(function(m){var d=S.mdone.indexOf(m.lv)>-1,ok=S.friends>=m.need&&!d,pc=Math.min(100,S.friends/m.need*100);return '<div class="mis"><b>Lv'+m.lv+'</b> : Invitez '+m.need+' amis à jouer pour recevoir : <b>'+fmt(m.r)+' Pièces Virtuelles</b><div class="bar"><i style="width:'+pc+'%"></i></div><button class="b" onclick="claim('+m.lv+')"'+(ok?'':' disabled')+'>'+(d?'Récompense reçue':ok?'Recevoir':'Verrouillé')+'</button></div>'}).join('');
+        $('hist').innerHTML=S.hist.map(function(t){return '<div class="hist">'+t+'</div>'}).join('')||'<p class="small">Aucun historique.</p>';
+        save();
+      }
+      function openM(i){closeM();$(i).classList.add('on')}
+      function closeM(){document.querySelectorAll('.ov').forEach(function(o){o.classList.remove('on')})}
+      function msg(t,b){$('msgT').textContent=t;$('msgB').textContent=b;openM('m-msg')}
+      function buy(i){var p=P[i];if(S.own[i]>=4)return;if(S.bal<p.price){msg('Solde insuffisant','Il vous faut '+fmt(p.price)+' Pièces Virtuelles.');return}
+        S.bal-=p.price;S.own[i]++;S.last[i].push({left:60,c:0});log('Achat Produit #'+p.n+' (−'+fmt(p.price)+')');render()}
+      function collect(i,k){var o=S.last[i][k];if(!o||o.c===S.day||o.left<=0)return;o.c=S.day;o.left--;S.bal+=P[i].d;S.ben+=P[i].d;log('Collecte Produit #'+P[i].n+' (+'+fmt(P[i].d)+')');render()}
+      function nextDay(){S.day++;render()}
+      function pointage(){if(S.lastPt===S.day){msg('Pointage','Déjà pointé aujourd’hui en jeu. Revenez au jour suivant !');return}S.lastPt=S.day;S.bal+=2000;S.ben+=2000;log('Pointage (+2 000)');render();msg('Pointage réussi','+2 000 Pièces Virtuelles')}
+      function useCode(){var c=$('codeIn').value.trim().toUpperCase();if(c==='KM7GIFT'&&!S.code){S.code=1;S.bal+=500;log('Code cadeau (+500)');render();msg('Code Cadeau','+500 Pièces Virtuelles !')}else msg('Code Cadeau',c==='KM7GIFT'?'Code déjà utilisé.':'Code invalide.');$('codeIn').value=''}
+      function deposit(){var a=+$('depAmt').value;S.bal+=a;log('Dépôt virtuel (+'+fmt(a)+')');render();msg('Dépôt Virtuel DEMO','+'+fmt(a)+' Pièces Virtuelles ajoutées. Fictif !')}
+      function withdraw(){var a=+$('retAmt').value;if(S.bal<a){msg('Solde insuffisant','Votre solde est de '+fmt(S.bal)+' Pièces.');return}S.bal-=a;log('Retrait virtuel (−'+fmt(a)+')');render();msg('Retrait Virtuel DEMO réussi','Fictif, juste pour s’amuser. Nouveau solde : '+fmt(S.bal)+' Pièces.')}
+      function invite(){S.friends++;log('Ami invité (démo)');render()}
+      function claim(l){var m=M[l-1];if(S.friends<m.need||S.mdone.indexOf(l)>-1)return;S.mdone.push(l);S.bal+=m.r;S.rw+=m.r;log('Mission Lv'+l+' (+'+fmt(m.r)+')');render();msg('Mission Lv'+l,'+'+fmt(m.r)+' Pièces Virtuelles')}
+      $('nav').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;document.querySelectorAll('.nav button').forEach(function(x){x.classList.toggle('on',x===b)});document.querySelectorAll('.pg').forEach(function(p){p.classList.toggle('on',p.id==='p-'+b.dataset.p)});window.scrollTo(0,0)});
+      var nm=['67X***','69X***','65X***','66X***'],na=[52000,18000,30500,12000,75000];
+      function notif(){$('notif').textContent='+237 '+nm[Math.floor(Math.random()*4)]+' a retiré '+fmt(na[Math.floor(Math.random()*5)])+' Pièces Virtuelles - DEMO'}
+      load();render();notif();setInterval(notif,5000);
+    </script>
+  </body>
+</html>
