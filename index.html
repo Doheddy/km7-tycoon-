@@ -139,7 +139,7 @@
             <b id="fr2">3</b>
           </p>
           <button class="b" style="width:100%" onclick="invite()">
-            Inviter un ami (démo)
+            Inviter un ami (réel)
           </button>
         </div>
       </div>
@@ -149,7 +149,7 @@
             Équipe
           </h2>
           <p style="font-size:14px">
-            Membres de l’équipe virtuelle :
+            Membres de l’équipe  :
             <b id="fr3">3</b>
           </p>
         </div>
@@ -199,10 +199,10 @@
     <div class="ov" id="m-dep">
       <div class="box">
         <h2>
-          Dépôt Virtuel
+          Dépôt réel
         </h2>
         <label>
-          Montant (Pièces Virtuelles)
+          Montant (Pièces réel)
         </label>
         <select id="depAmt">
           <option>1000</option>
@@ -237,10 +237,10 @@
     <div class="ov" id="m-ret">
       <div class="box">
         <h2>
-          Portefeuille Virtuel
+          Portefeuille 
         </h2>
         <label>
-          Montant du retrait (Pièces)
+          Montant du retrait (Solde)
         </label>
         <select id="retAmt">
           <option>1000</option>
@@ -249,11 +249,11 @@
           <option>10000</option>
         </select>
         <label>
-          Numéro DEMO
+          Numéro 
         </label>
-        <input id="retNum" value="07 00 00 00 00" readonly />
+        <input id="retNum" value="+225              " readonly />
         <button class="b" style="width:100%" onclick="withdraw()">
-          Retrait Virtuel
+          Retrait réel
         </button>
         <button class="b alt" style="width:100%;margin-top:8px" onclick="closeM()">
           Fermer
@@ -354,13 +354,13 @@ function load(){
       function nextDay(){S.day++;render()}
       function pointage(){if(S.lastPt===S.day){msg('Pointage','Déjà pointé aujourd’hui en jeu. Revenez au jour suivant !');return}S.lastPt=S.day;S.bal+=2000;S.ben+=2000;log('Pointage (+2 000)');render();msg('Pointage réussi','+2 000 Pièces Virtuelles')}
       function useCode(){var c=$('codeIn').value.trim().toUpperCase();if(c==='KM7GIFT'&&!S.code){S.code=1;S.bal+=500;log('Code cadeau (+500)');render();msg('Code Cadeau','+500 Pièces Virtuelles !')}else msg('Code Cadeau',c==='KM7GIFT'?'Code déjà utilisé.':'Code invalide.');$('codeIn').value=''}
-      function deposit(){var a=+$('depAmt').value;S.bal+=a;log('Dépôt virtuel (+'+fmt(a)+')');render();msg('Dépôt Virtuel DEMO','+'+fmt(a)+' Pièces Virtuelles ajoutées. Fictif !')}
-      function withdraw(){var a=+$('retAmt').value;if(S.bal<a){msg('Solde insuffisant','Votre solde est de '+fmt(S.bal)+' Pièces.');return}S.bal-=a;log('Retrait virtuel (−'+fmt(a)+')');render();msg('Retrait Virtuel DEMO réussi','Fictif, juste pour s’amuser. Nouveau solde : '+fmt(S.bal)+' Pièces.')}
+      function deposit(){var a=+$('depAmt').value;S.bal+=a;log('Dépôt virtuel (+'+fmt(a)+')');render();msg('Dépôt reél','+'+fmt(a)+' Pièces Virtuelles ajoutées. Fictif !')}
+      function withdraw(){var a=+$('retAmt').value;if(S.bal<a){msg('Solde insuffisant','Votre solde est de '+fmt(S.bal)+' Pièces.');return}S.bal-=a;log('Retrait  (−'+fmt(a)+')');render();msg('Retrait réussi','réel. Nouveau solde : '+fmt(S.bal)+' Pièces.')}
       function invite(){S.friends++;log('Ami invité (démo)');render()}
       function claim(l){var m=M[l-1];if(S.friends<m.need||S.mdone.indexOf(l)>-1)return;S.mdone.push(l);S.bal+=m.r;S.rw+=m.r;log('Mission Lv'+l+' (+'+fmt(m.r)+')');render();msg('Mission Lv'+l,'+'+fmt(m.r)+' Pièces Virtuelles')}
       $('nav').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;document.querySelectorAll('.nav button').forEach(function(x){x.classList.toggle('on',x===b)});document.querySelectorAll('.pg').forEach(function(p){p.classList.toggle('on',p.id==='p-'+b.dataset.p)});window.scrollTo(0,0)});
       var nm=['67X***','69X***','65X***','66X***'],na=[52000,18000,30500,12000,75000];
-      function notif(){$('notif').textContent='+237 '+nm[Math.floor(Math.random()*4)]+' a retiré '+fmt(na[Math.floor(Math.random()*5)])+' Pièces Virtuelles - DEMO'}
+      function notif(){$('notif').textContent='+237 '+nm[Math.floor(Math.random()*4)]+' a retiré '+fmt(na[Math.floor(Math.random()*5)])+' Pièces réel '}
       load();render();notif();setInterval(notif,5000);
     </script>
   </body>
