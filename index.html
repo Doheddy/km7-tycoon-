@@ -516,6 +516,7 @@ function cleanStr(str){
     .replace(/Pièces\s+Virtuelles?/gi, "FCFA")
     .replace(/Pièces\s+réel(?:les?)?/gi, "FCFA")
     .replace(/Pièces\s+de\s+Récompenses?/gi, "FCFA de Récompense")
+    .replace(/\s*\(démo\)/gi, "")
     .replace(/\bPièces\b/g, "FCFA");
 }
 var _origMsg = msg;
