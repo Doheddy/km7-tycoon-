@@ -45,6 +45,26 @@
     </style>
   </head>
   <body>
+    <div id="auth-screen" style="position:fixed;inset:0;background:#f4f4f4;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:sans-serif">
+  <div style="width:100%;max-width:380px">
+    <h2 style="text-align:center;color:#d62839;margin-bottom:24px">KM7 TYCOON</h2>
+    <div style="background:#fff;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+      <span style="font-weight:600;color:#222">📱 +225</span>
+      <input id="auth-phone" type="tel" placeholder="Numéro de téléphone" style="border:none;outline:none;font-size:16px;width:100%">
+    </div>
+    <div style="background:#fff;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+      <span>🔒</span>
+      <input id="auth-pass" type="password" placeholder="Mot de passe" style="border:none;outline:none;font-size:16px;width:100%">
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#444;margin-bottom:22px">
+      <label style="display:flex;align-items:center;gap:6px"><input id="auth-rem" type="checkbox" checked> Souviens-toi</label>
+      <span style="color:#666">Mot de passe oublié ?</span>
+    </div>
+    <p id="auth-msg" style="color:#d62839;font-size:13px;text-align:center;min-height:18px;margin-bottom:10px"></p>
+    <button onclick="loginPlayer()" style="width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#12b86a,#15b097);color:#fff;font-size:17px;font-weight:600;margin-bottom:14px;cursor:pointer">Se connecter</button>
+    <button onclick="registerPlayer()" style="width:100%;padding:14px;border:2px solid #f06565;border-radius:12px;background:#fff;color:#f06565;font-size:17px;font-weight:600;cursor:pointer">S'inscrire</button>
+  </div>
+</div>
     <div class="wrap">
       <div class="banner">
         KM7  TYCOON - Plateforme officielle 
@@ -328,7 +348,112 @@ function load(){
     }
   });
 }
+function normPhone(v){
+  var d = String(v || "").replace(/\D/g, "");
+  if(d.indexOf("225") === 0 && d.length > 10) d = d.slice(3);
+  return "+225" + d;
+}
 
+function showAuth(msg){
+  var el = document.getElementById("auth-screen");
+  if(el) el.style.display = "flex";
+  var m = document.getElementById("auth-msg");
+  if(m) m.textContent = msg || "";
+}
+
+function hideAuth(){
+  var el = document.getElementById("auth-screen");
+  if(el) el.style.display = "none";
+}
+
+function applyPlayerRow(row){
+  if(!row) return;
+  PLAYER_ID = row.id;
+  try{ localStorage.setItem("km7_pid", PLAYER_ID); }catch(e){}
+  S.pseudo = row.pseudo || S.pseudo || "Joueur";
+  if(typeof row.bal !== "undefined") S.bal = Number(row.bal) || 0;
+  if(typeof row.ben !== "undefined") S.ben = Number(row.ben) || 0;
+  if(typeof row.day !== "undefined") S.day = Number(row.day) || 1;
+  if(row.own) S.own = row.own;
+  if(row.hist) S.hist = row.hist;
+  if(typeof render === "function") render();
+}
+
+function registerPlayer(){
+  var rawPhone = document.getElementById("auth-phone").value.trim();
+  var pass = document.getElementById("auth-pass").value;
+  var rem = document.getElementById("auth-rem") && document.getElementById("auth-rem").checked;
+  var digits = rawPhone.replace(/\D/g, "");
+  if(!digits || digits.length < 8){ showAuth("Entrez un numéro +225 valide."); return; }
+  if(!pass || pass.length < 4){ showAuth("Mot de passe : 4 caractères minimum."); return; }
+  if(!sb){ showAuth("Connexion base indisponible."); return; }
+  var phone = normPhone(digits);
+  showAuth("Inscription en cours...");
+
+  sb.from("players").select("*").eq("phone", phone).then(function(res){
+    if(res.error){ showAuth("Erreur : " + res.error.message); return; }
+    if(res.data && res.data.length > 0){
+      showAuth("Ce numéro est déjà inscrit. Cliquez sur Se connecter.");
+      return;
+    }
+    var newRow = {
+      phone: phone,
+      password: pass,
+      pseudo: "Joueur " + digits.slice(-4),
+      bal: 0,
+      ben: 0,
+      day: 1,
+      own: [],
+      hist: [],
+      updated_at: new Date().toISOString()
+    };
+    sb.from("players").insert(newRow).select().then(function(ins){
+      if(ins.error || !ins.data || !ins.data[0]){
+        showAuth("Erreur inscription : " + (ins.error ? ins.error.message : "réessayez"));
+        return;
+      }
+      if(rem) try{ localStorage.setItem("km7_phone", phone); }catch(e){}
+      applyPlayerRow(ins.data[0]);
+      hideAuth();
+    });
+  });
+}
+
+function loginPlayer(){
+  var rawPhone = document.getElementById("auth-phone").value.trim();
+  var pass = document.getElementById("auth-pass").value;
+  var rem = document.getElementById("auth-rem") && document.getElementById("auth-rem").checked;
+  var digits = rawPhone.replace(/\D/g, "");
+  if(!digits){ showAuth("Entrez votre numéro de téléphone."); return; }
+  if(!pass){ showAuth("Entrez votre mot de passe."); return; }
+  if(!sb){ showAuth("Connexion base indisponible."); return; }
+  var phone = normPhone(digits);
+  showAuth("Connexion...");
+
+  sb.from("players").select("*").eq("phone", phone).then(function(res){
+    if(res.error){ showAuth("Erreur : " + res.error.message); return; }
+    var user = (res.data && res.data[0]) ? res.data[0] : null;
+    if(!user){ showAuth("Compte introuvable. Cliquez sur S'inscrire."); return; }
+    if(user.password !== pass){ showAuth("Mot de passe incorrect."); return; }
+    if(rem) try{ localStorage.setItem("km7_phone", phone); }catch(e){}
+    applyPlayerRow(user);
+    hideAuth();
+  });
+}
+
+(function initAuthGate(){
+  try{
+    var savedPhone = localStorage.getItem("km7_phone");
+    if(savedPhone && document.getElementById("auth-phone")){
+      document.getElementById("auth-phone").value = savedPhone.replace(/^\+225/, "");
+    }
+  }catch(e){}
+  if(!PLAYER_ID){
+    showAuth("");
+  } else {
+    hideAuth();
+  }
+})();
       function $(i){return document.getElementById(i)}
       function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
       function log(t){S.hist.unshift('Jour '+S.day+' · '+t);S.hist=S.hist.slice(0,40)}
