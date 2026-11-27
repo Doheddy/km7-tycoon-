@@ -528,6 +528,33 @@ notif = function(){
   _origNotif();
   cleanRealLabels();
 };
+function initMeAccountBox(){
+  var histEl = document.getElementById("hist");
+  if(!histEl || document.getElementById("km7-me-box")) return;
+  var box = document.createElement("div");
+  box.id = "km7-me-box";
+  box.className = "card";
+  box.innerHTML =
+    "<h2>Mon Compte</h2>" +
+    "<p style='margin:6px 0 12px 0;'>Connecté : <b id='km7-me-pseudo'>-</b></p>" +
+    "<button type='button' onclick='logoutPlayer()' style='width:100%;padding:10px;border:none;border-radius:8px;background:#c0392b;color:#fff;font-weight:bold;cursor:pointer;'>Déconnexion</button>";
+  histEl.parentNode.insertBefore(box, histEl);
+}
+function logoutPlayer(){
+  try {
+    localStorage.removeItem("km7_player_id");
+    localStorage.removeItem("km7_state");
+  } catch(e) {}
+  PLAYER_ID = null;
+  if(typeof showAuth === "function") showAuth("Déconnecté. Connectez-vous ou inscrivez-vous.");
+}
+var _origRenderMe = render;
+render = function(){
+  _origRenderMe();
+  initMeAccountBox();
+  var pEl = document.getElementById("km7-me-pseudo");
+  if(pEl) pEl.textContent = (typeof S !== "undefined" && S.pseudo) ? S.pseudo : "Joueur";
+}; 
     </script>
   </body>
 </html>
