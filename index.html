@@ -509,6 +509,25 @@ render = function(){
   _origRender();
   cleanRealLabels();
 };
+function cleanStr(str){
+  if(typeof str !== "string") return str;
+  return str
+    .replace(/Produit\s+VIRTUEL/gi, "Pack")
+    .replace(/Pièces\s+Virtuelles?/gi, "FCFA")
+    .replace(/Pièces\s+réel(?:les?)?/gi, "FCFA")
+    .replace(/Pièces\s+de\s+Récompenses?/gi, "FCFA de Récompense")
+    .replace(/\bPièces\b/g, "FCFA");
+}
+var _origMsg = msg;
+msg = function(t, b){
+  _origMsg(cleanStr(t), cleanStr(b));
+  cleanRealLabels();
+};
+var _origNotif = notif;
+notif = function(){
+  _origNotif();
+  cleanRealLabels();
+};
     </script>
   </body>
 </html>
