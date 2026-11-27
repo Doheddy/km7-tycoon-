@@ -488,6 +488,27 @@ function loginPlayer(){
       var nm=['67X***','69X***','65X***','66X***'],na=[52000,18000,30500,12000,75000];
       function notif(){$('notif').textContent='+237 '+nm[Math.floor(Math.random()*4)]+' a retiré '+fmt(na[Math.floor(Math.random()*5)])+' Pièces réel '}
       load();render();notif();setInterval(notif,5000);
+      function cleanRealLabels(){
+  var walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+  var n;
+  while((n = walk.nextNode())){
+    if(n.parentElement && n.parentElement.closest('#auth-screen')) continue;
+    var t = n.nodeValue;
+    if(!t) continue;
+    var nt = t
+      .replace(/Produit\s+VIRTUEL/gi, "Pack")
+      .replace(/Pièces\s+Virtuelles?/gi, "FCFA")
+      .replace(/Pièces\s+réel(?:les?)?/gi, "FCFA")
+      .replace(/Pièces\s+de\s+Récompenses?/gi, "FCFA de Récompense")
+      .replace(/\bPièces\b/g, "FCFA");
+    if(nt !== t) n.nodeValue = nt;
+  }
+}
+var _origRender = render;
+render = function(){
+  _origRender();
+  cleanRealLabels();
+};
     </script>
   </body>
 </html>
