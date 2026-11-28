@@ -602,6 +602,43 @@ render = function(){
   var pEl = document.getElementById("km7-me-pseudo");
   if(pEl) pEl.textContent = (typeof S !== "undefined" && S.pseudo) ? S.pseudo : "Joueur";
 }; 
+const WAVE_BASE_URL = "https://pay.wave.com/m/M_ci_ladnfju4ARI3/c/ci/";
+
+async function confirmerDepotWave(playerId, amount) {
+  const montant = Number(amount);
+
+  if (!playerId) {
+    alert("Joueur introuvable. Recharge la page.");
+    return;
+  }
+
+  if (!Number.isFinite(montant) || montant <= 0) {
+    alert("Entre ou sélectionne un montant valide en FCFA.");
+    return;
+  }
+
+  // Enregistre la demande en attente ('pending') dans Supabase
+  const { data: reqData, error } = await supabaseClient
+    .from("payment_requests")
+    .insert({
+      player_id: PLAYER_ID,
+      req_type: "deposit",
+      amount: montant,
+      status: "pending"
+    })
+    .select("id")
+    .single();
+
+  if (error || !reqData) {
+    console.error("Erreur insertion payment_requests :", error);
+    alert("Erreur lors de l'enregistrement de la demande.");
+    return;
+  }
+
+  // Redirige vers Wave Business avec le montant exact choisi
+  const waveUrl = `${WAVE_BASE_URL}?amount=${encodeURIComponent(montant)}`;
+  window.open(waveUrl, "_blank", "noopener,noreferrer");
+}
     </script>
   </body>
 </html>
