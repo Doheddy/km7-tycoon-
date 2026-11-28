@@ -542,6 +542,27 @@ function initMeAccountBox(){
     "<button type='button' onclick='logoutPlayer()' style='width:100%;padding:10px;border:none;border-radius:8px;background:#c0392b;color:#fff;font-weight:bold;cursor:pointer;'>Déconnexion</button>";
   histEl.parentNode.insertBefore(box, histEl);
 }
+async function acheterPackServeur(packName, price, dailyReward = 0) {
+  if (!window.sb || !window.sb.rpc) {
+    throw new Error("Client Supabase non initialise");
+  }
+
+  const { data, error } = await window.sb.rpc("buy_pack", {
+    p_pack_name: String(packName),
+    p_price: Number(price),
+    p_daily_reward: Number(dailyReward || 0)
+  });
+
+  if (error) {
+    throw new Error(error.message || "Achat refuse par le serveur");
+  }
+
+  if (typeof refreshPlayerFromServer === "function") {
+    await refreshPlayerFromServer();
+  }
+
+  return data;
+}
 function logoutPlayer(){
   try {
     localStorage.removeItem("km7_player_id");
