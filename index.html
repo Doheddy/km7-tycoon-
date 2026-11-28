@@ -605,14 +605,20 @@ render = function(){
 const WAVE_BASE_URL = "https://pay.wave.com/m/M_ci_ladnfju4ARI3/c/ci/";
 
 async function confirmerDepotWave(playerId, amount) {
-  const montant = Number(amount);
+    const rawMontant =
+    amount ??
+    document.getElementById("depAmt")?.value ??
+    document.querySelector("#m-dep input, #m-dep select")?.value ??
+    "";
+
+  const montant = Number(String(rawMontant).replace(/\s+/g, "").replace(",", "."));
 
   if (!playerId) {
     alert("Joueur introuvable. Recharge la page.");
     return;
   }
 
-  if (!Number.isFinite(montant) || montant <= 0) {
+   if (!Number.isFinite(montant) || montant <= 0) {
     alert("Entre ou sélectionne un montant valide en FCFA.");
     return;
   }
