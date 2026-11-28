@@ -557,9 +557,27 @@ function initMeAccountBox(){
   histEl.parentNode.insertBefore(box, histEl);
 }
 async function acheterPackServeur(packName, price, dailyReward = 0) {
-  if (!window.sb || !window.sb.rpc) {
+  var client = (typeof window !== "undefined" && window.sb) || (typeof sb !== "undefined" ? sb : null);
+  if (!client || typeof client.rpc !== "function") {
     throw new Error("Client Supabase non initialise");
   }
+
+  const { data, error } = await client.rpc("buy_pack", {
+    p_pack_name: String(packName),
+    p_price: Number(price),
+    p_daily_reward: Number(dailyReward || 0)
+  });
+
+  if (error) {
+    throw new Error(error.message || "Achat refuse par le serveur");
+  }
+
+  if (typeof refreshPlayerFromServer === "function") {
+    await refreshPlayerFromServer();
+  }
+
+  return data;
+}
 
   const { data, error } = await window.sb.rpc("buy_pack", {
     p_pack_name: String(packName),
