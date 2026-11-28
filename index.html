@@ -562,11 +562,20 @@ async function acheterPackServeur(packName, price, dailyReward = 0) {
     throw new Error("Client Supabase non initialise");
   }
 
-  const { data, error } = await client.rpc("buy_pack", {
-    p_pack_name: String(packName),
-    p_price: Number(price),
-    p_daily_reward: Number(dailyReward || 0)
-  });
+  var pid =
+  (typeof PLAYER_ID !== "undefined" && PLAYER_ID) ||
+  (window.currentPlayer && window.currentPlayer.id) ||
+  (typeof S !== "undefined" && S && (S.playerId || S.userId || S.id)) ||
+  localStorage.getItem("km7_player_id") ||
+  localStorage.getItem("player_id") ||
+  null;
+
+const { data, error } = await client.rpc("buy_pack", {
+  p_pack_name: String(packName),
+  p_price: Number(price),
+  p_daily_reward: Number(dailyReward || 0),
+  p_player_id: pid
+}); 
 
   if (error) {
     throw new Error(error.message || "Achat refuse par le serveur");
