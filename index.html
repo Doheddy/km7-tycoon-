@@ -474,8 +474,22 @@ function loginPlayer(){
       function openM(i){closeM();$(i).classList.add('on')}
       function closeM(){document.querySelectorAll('.ov').forEach(function(o){o.classList.remove('on')})}
       function msg(t,b){$('msgT').textContent=t;$('msgB').textContent=b;openM('m-msg')}
-      function buy(i){var p=P[i];if(S.own[i]>=4)return;if(S.bal<p.price){msg('Solde insuffisant','Il vous faut '+fmt(p.price)+' Pièces Virtuelles.');return}
-        S.bal-=p.price;S.own[i]++;S.last[i].push({left:60,c:0});log('Achat Produit #'+p.n+' (−'+fmt(p.price)+')');render()}
+      async function buy(i){
+  var p=P[i];
+  if(!p) return;
+  if((S.own[i]||0)>=4){msg('Achat','Limite de 4 packs atteinte');return;}
+  if(S.bal<p.price){msg('Solde insuffisant','Recharge ton solde FCFA pour acheter ce pack.');return;}
+  try{
+    await acheterPackServeur(p.name||('Pack #'+(i+1)),p.price,p.d||0);
+    S.own[i]=(S.own[i]||0)+1;
+    if(!S.last[i]) S.last[i]=[];
+    S.last[i].push({left:60,c:0});
+    log('Achat '+(p.name||('Pack #'+(i+1)))+' (-'+fmt(p.price)+' FCFA)');
+    render();
+  }catch(e){
+    msg('Achat',e.message||'Impossible de valider l\'achat sur le serveur');
+  }
+}
       function collect(i,k){var o=S.last[i][k];if(!o||o.c===S.day||o.left<=0)return;o.c=S.day;o.left--;S.bal+=P[i].d;S.ben+=P[i].d;log('Collecte Produit #'+P[i].n+' (+'+fmt(P[i].d)+')');render()}
       function nextDay(){S.day++;render()}
       function pointage(){if(S.lastPt===S.day){msg('Pointage','Déjà pointé aujourd’hui en jeu. Revenez au jour suivant !');return}S.lastPt=S.day;S.bal+=2000;S.ben+=2000;log('Pointage (+2 000)');render();msg('Pointage réussi','+2 000 Pièces Virtuelles')}
